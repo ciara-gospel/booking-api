@@ -2,6 +2,7 @@
 
 import pg from "pg"
 import logger from "../utils/logger.js"
+import "dotenv/config"
 
 const { Pool } = pg
 
@@ -189,4 +190,4 @@ const query = async (text, params) => {
   }
 }
 
-export default { pool, connectToDb, query, initializeDbSchema }
+export default { pool, connectToDb, query, initializeDbSchema };

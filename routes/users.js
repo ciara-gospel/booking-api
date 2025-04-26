@@ -6,7 +6,7 @@ import logger from '../utils/logger.js';
 const router = express.Router();
 
 /* GET users listing. */
-router.get('/', authMiddleware, (req, res, next) => {
+router.get('/register', authMiddleware, (req, res, next) => {
   logger.info('Fetching current user data for:', req.user);
   return res.json({ user: req.user })
 });
