@@ -25,6 +25,9 @@ const authMiddleware = (req, res, next) => {
     if (err.name === 'JsonWebTokenError') {
       return res.status(401).json({ message: "Token is not valid" })
     }
+    if (req.user.role !== 'provider') {
+        return res.status(403).json({message: "Only service providers can perfom this action" })
+    }
     return res.status(err.status || 500).json({ message: err.message || "server error during token verification" })
   }
 

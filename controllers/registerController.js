@@ -1,9 +1,10 @@
 //controllers/register.js
 
-import { query } from "../config/db.js";
+import db from "../config/db.js";
 import logger from "../utils/logger.js";
 import bcrypt from "bcryptjs"
 
+const { query } = db;
 const HASH_SALT = 10
 
 export default async function registerHandler(req, res, next) {

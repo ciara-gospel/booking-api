@@ -1,7 +1,7 @@
-
-
-import { query } from '../config/db.js';
+import db from '../config/db.js';
 import logger from '../utils/logger.js';
+
+const { query } = db;
 
 export default async function createTimeSlotHandler(req, res, next) {
   const { date, start_time, end_time, provider_id } = req.body;
@@ -14,8 +14,8 @@ export default async function createTimeSlotHandler(req, res, next) {
     }
 
     const insertSql = `
-      INSERT INTO time_slots (provider_id, date, start_time, end_time)
-      VALUES ($1, $2, $3, $4)
+      INSERT INTO time_slots (provider_id, date, start_time, end_time, is_booked)
+      VALUES ($1, $2, $3, $4, FALSE)
       RETURNING id, provider_id, date, start_time, end_time
     `;
     const newTimeSlotResult = await query(insertSql, [provider_id, date, start_time, end_time]);
@@ -123,6 +123,4 @@ export async function viewAvailableSlotsHandler(req, res, next) {
     return res.status(500).json({ message: 'Internal Server Error' });
   }
 }
-
-
-  
+ 

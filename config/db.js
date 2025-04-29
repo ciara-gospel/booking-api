@@ -96,15 +96,15 @@ const initializeDbSchema = async () => {
     await client.query(`CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)`);
     await client.query(`CREATE INDEX IF NOT EXISTS idx_appointments_user_id ON appointments(user_id)`);
     await client.query(`CREATE INDEX IF NOT EXISTS idx_appointments_provider_id ON appointments(provider_id)`);
-    await client.query(`CREATE INDEX IF NOT EXISTS idx_appointments time_slot_id ON appointments time_slots(id) `);
+    await client.query(`CREATE INDEX IF NOT EXISTS idx_appointments_time_slot_id ON appointments (time_slot_id)`);
 
     logger.info('Indexes have been ensured')
 
     await client.query(`
       INSERT INTO service_providers (name, service_type, email)
       VALUES 
-        ('Dr. Alice Smith', 'Dermatologist', 'alice@clinic.com'),
-        ('Dr. Bob Johnson', 'Therapist', 'bob@therapycenter.com')
+        ('Mr. Gaston Che', 'Developper', 'gaston@codecamp.com'),
+        ('Dr. Elisabeth onyo', 'Therapist', 'elisabeth@therapycenter.com')
       ON CONFLICT (email) DO NOTHING;
     `);
     logger.info('Pre-configured providers inserted');

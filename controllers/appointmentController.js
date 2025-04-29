@@ -1,5 +1,7 @@
-import { query } from '../config/db.js'; // Your database connection
-import logger from '../utils/logger.js'; 
+import logger from '../utils/logger.js';
+import db from '../config/db.js';
+
+const { query } = db;
 
 // Book Appointment
 export const bookAppointment = async (req, res) => {
@@ -11,10 +13,24 @@ export const bookAppointment = async (req, res) => {
             return res.status(400).json({ message: 'Slot ID and Provider ID are required.' });
         }
 
-        // Check if slot is available
-        const slotResult = await query('SELECT * FROM slots WHERE id = $1 AND is_booked = FALSE', [slotId]);
+        // Start a transaction
+        await query('BEGIN');
+
+        // Check if slot exists and is not booked
+        const slotResult = await query(
+            'SELECT * FROM slots WHERE id = $1 FOR UPDATE',
+            [slotId]
+        );
+
         if (slotResult.rowCount === 0) {
-            return res.status(400).json({ message: 'Selected time slot is not available.' });
+            await query('ROLLBACK');
+            return res.status(404).json({ message: 'Time slot not found.' });
+        }
+
+        const slot = slotResult.rows[0];
+        if (slot.is_booked) {
+            await query('ROLLBACK');
+            return res.status(400).json({ message: 'This time slot is already booked.' });
         }
 
         // Create appointment
@@ -27,8 +43,15 @@ export const bookAppointment = async (req, res) => {
         // Mark slot as booked
         await query('UPDATE slots SET is_booked = TRUE WHERE id = $1', [slotId]);
 
-        res.status(201).json({ message: 'Appointment booked successfully.', appointment: appointmentResult.rows[0] });
+        // Commit transaction
+        await query('COMMIT');
+
+        res.status(201).json({
+            message: 'Appointment booked successfully.',
+            appointment: appointmentResult.rows[0]
+        });
     } catch (error) {
+        await query('ROLLBACK');
         logger.error('Error booking appointment:', error);
         res.status(500).json({ message: 'Server error while booking appointment.' });
     }
