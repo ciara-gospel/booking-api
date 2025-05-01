@@ -1,7 +1,9 @@
-import { query } from "../config/db.js"
 import logger from "../utils/logger.js"
 import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
+import db from "../config/db.js"
+
+const {query} = db;
 
 export default async function loginHandler(req, res, next) {
   const { email, password } = req.body
