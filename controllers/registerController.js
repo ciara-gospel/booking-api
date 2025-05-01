@@ -39,3 +39,25 @@ export default async function registerHandler(req, res, next) {
     next(error)
   }
 }
+
+export async function registerAsProviderHandler(req, res) {
+    const userId = req.user.id;
+    const { name, service_type, email } = req.body;
+  
+    try {
+      const insertSql = `
+        INSERT INTO service_providers (id, name, service_type, email)
+        VALUES ($1, $2, $3, $4)
+        RETURNING *
+      `;
+      const result = await db.query(insertSql, [userId, name, service_type, email]);
+  
+      return res.status(201).json({
+        message: 'User registered as provider successfully',
+        provider: result.rows[0]
+      });
+    } catch (error) {
+      console.error('Error registering provider:', error);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+  }
